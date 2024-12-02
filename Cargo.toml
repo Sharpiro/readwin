@@ -1,0 +1,9 @@
+[package]
+name = "readwin"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+anyhow = "1.0.93"
+extend = "1.2.0"
+zerocopy = { version = "0.8.11", features = ["derive"] }

@@ -1,6 +1,6 @@
 use anyhow::Result;
 use extension::{OptionTExt, ResultTEExt};
-use std::ffi::CStr;
+use std::{borrow::Cow, ffi::CStr};
 use zerocopy::{FromBytes, Immutable, KnownLayout};
 
 pub mod extension;
@@ -52,12 +52,17 @@ fn main() -> Result<()> {
     println!("Section Headers:");
     for (i, section_header) in section_headers.iter().enumerate() {
         let name = CStr::from_bytes_until_nul(&section_header.name)?.to_str()?;
-        let name = match name {
+        let display_name = match name {
             "/4" => ".debug_info",
             "/16" => ".debug_abbrev",
             "/30" => ".debug_line",
             "/42" => ".debug_str",
-            _ => name,
+            _ => "",
+        };
+        let name: Cow<str> = if display_name.is_empty() {
+            name.into()
+        } else {
+            format!("{name}: {display_name}").into()
         };
         let address = winpe_header.image_optional_header.image_base
             + u64::from(section_header.virtual_address);
